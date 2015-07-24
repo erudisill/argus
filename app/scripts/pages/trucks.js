@@ -51,7 +51,7 @@ var trucks = {
 			shape.lineTo(-1 * sizex, 1 * sizey);
 			// t.geometry = new THREE.BoxGeometry(2, 1, 2);
 			var extrudeSettings = {
-				amount : 1,
+				amount : -2,
 				bevelEnabled : false,
 				material : 0,
 				extrudeMaterial : 0
@@ -78,6 +78,7 @@ var trucks = {
 		}
 
 		this.sort_waypoints(points);
+		recorder.initRecorder();
 	},
 
 	sort_waypoints : function(points) {
@@ -289,5 +290,7 @@ var trucks = {
 				this.update_one(delta, t);
 			}
 		}
+
+		recorder.logTruckPositions(this.trucks);
 	}
 };

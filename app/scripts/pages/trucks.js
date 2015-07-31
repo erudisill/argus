@@ -79,6 +79,9 @@ var trucks = {
 
 		this.sort_waypoints(points);
 		recorder.initRecorder();
+		var p = [];
+
+		console.log(recorder.getAllTruckPositions(52, this.trucks));
 	},
 
 	sort_waypoints : function(points) {
@@ -275,7 +278,7 @@ var trucks = {
 				this.next_truck_entrance = threeUtils.swing(10000, 3000);
 				this.recent_truck_entrance = Date.now();
 				this.start(choice);
-				console.log('Elapsed: ' + elapsed + '  Picked ' + choice.id + '   Next entrance: ' + this.next_truck_entrance);
+				//console.log('Elapsed: ' + elapsed + '  Picked ' + choice.id + '   Next entrance: ' + this.next_truck_entrance);
 			}
 		}
 	},

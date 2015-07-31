@@ -137,6 +137,7 @@ var blueprints = {
 				waypoints.id = pid;
 				waypoints.points = points;
 				_this.waypoints.push(waypoints);
+				console.log(waypoints)
 			});
 		},
 

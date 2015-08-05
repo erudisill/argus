@@ -1,5 +1,30 @@
+'use strict';
+
 var record_time = Date.now();
-var tick = 0;
+var RecordTick = 0;
+
+// Class/Object structure for dynamic truck position log requests
+function TruckLogRequest(t){
+	this.truckRequest = new XMLHttpRequest();
+	this.truck = t;
+}
+
+TruckLogRequest.prototype = {
+	constructor : TruckLogRequest,
+
+	start : function(){
+		this.truckRequest.onreadystatechange = this.onComplete;
+		var x = (this.truck.status != 0) ? this.truck.model.position.x : 'NULL';
+		var y = (this.truck.status != 0) ? this.truck.model.position.y : 'NULL';
+		var z = (this.truck.status != 0) ? this.truck.model.position.z : 'NULL';
+		this.truckRequest.open('GET', 'http://localhost:5000/log/position/' + this.truck.id + '/' + RecordTick + '/' + this.truck.status + '/' + x + '/' + y + '/' + z, true);
+		this.truckRequest.send();
+	},
+
+	onComplete : function(){
+		console.log('LOG COMPLETE');
+	}
+};
 
 var recorder = {
 
@@ -12,7 +37,7 @@ var recorder = {
 	initRecorder : function(){
 		var initRequest = new XMLHttpRequest();
 		initRequest.onreadystatechange = function(){ /* PASS */ };
-	    initRequest.open("GET", "http://localhost:5000/create/session", true);
+	    initRequest.open('GET', 'http://localhost:5000/create/session', true);
 	    initRequest.send();
 	    return initRequest.responseText;
 	},
@@ -20,14 +45,14 @@ var recorder = {
 	// Logs position records for all relevant trucks every 1 seconds 
 	logTruckPositions : function(trucks){
 		if(Date.now() - record_time > 1000){
-			tick++;
+			RecordTick++;
 			for (var i = 0; i < trucks.length; i++) {
 				var truck = trucks[i];
 				try{
-					truckLog = new TruckLogRequest(truck);
+					var truckLog = new TruckLogRequest(truck);
 					truckLog.start();
 				} catch(err){
-					alert(err.message);
+					console.log(err.message);
 				}
 			}
 			record_time = Date.now();
@@ -48,32 +73,22 @@ var recorder = {
 	// WARNING: IS NOT ASYNCHRONOUS (yet!)
 	getTruckPositions : function(session_key, t_id){
 		var syncRequest = new XMLHttpRequest();
-		syncRequest.open("GET", "http://localhost:5000/retrieve/positions/" + session_key + "/" + t_id, false);
+		syncRequest.open('GET', 'http://localhost:5000/retrieve/positions/' + session_key + '/' + t_id, false);
 		syncRequest.send();
-		var pos = syncRequest.responseText.split("<br>");
+		var pos = syncRequest.responseText.split('<br>');
 		for(var i = 0; i < pos.length; i++){
-  			pos[i] = pos[i].split(",");
+  			pos[i] = pos[i].split(',\'');
 		}
 		return pos;
-	}
-};
-
-// Class/Object structure for dynamic truck position log requests
-function TruckLogRequest(t){
-	this.truckRequest = new XMLHttpRequest();
-	this.truck = t;
-}
-
-TruckLogRequest.prototype = {
-	constructor : TruckLogRequest,
-
-	start : function(){
-		this.truckRequest.onreadystatechange = this.onComplete;
-		this.truckRequest.open("GET", "http://localhost:5000/log/position/" + this.truck.id + "/" + tick + "/" + this.truck.status + "/" + this.truck.model.position.x + "/" + this.truck.model.position.y + "/" + this.truck.model.position.z, true);
-		this.truckRequest.send();
 	},
 
-	onComplete : function(){
-		console.log("LOG COMPLETE");
+	// Returns the number of ticks recorded for a specific session
+	// WARNING: IS NOT ASYNCHRONOUS (yet!)
+	getMaxTicks : function(session_key){
+		var request = new XMLHttpRequest();
+		request.open('GET', 'http://localhost:5000/retrieve/length/tick/' + session_key, false)
+		request.send();
+		console.log(request.responseText);
+		return parseInt(request.responseText);
 	}
-}
+};

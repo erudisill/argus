@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="styles/animate.css">
   <link rel="stylesheet" href="styles/urban.css">
   <link rel="stylesheet" href="styles/urban.skins.css">
+  <link rel="stylesheet" href="styles/bootstrap-slider.css">
   <!-- endbuild -->
 
 </head>
@@ -68,7 +69,6 @@
     <div class="sidebar-panel offscreen-left">
 
       <div class="brand">
-
         <!-- logo -->
         <div class="brand-logo">
           <img src="images/logo.png" height="15" alt="">
@@ -262,7 +262,18 @@
 
       <!-- main area -->
       <div class="main-content">
-		<div  id="container"></div>
+		    <div  id="container">
+          <button id="btn_start" type="button" class="btn btn-default btn-lg" onclick="start()">
+            <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Play
+          </button>
+          <button id="btn_pause" type="button" class="btn btn-default btn-lg" onclick="pause()">
+            <span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause
+          </button>
+          <button id="btn_replay" type="button" class="btn btn-default btn-lg" onclick="replay()">
+            <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Replay
+          </button>
+          <input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"/>
+        </div>
       </div>
       <!-- /main area -->
     </div>
@@ -352,7 +363,55 @@
 	<script src="scripts/pages/trucks_replay.js"></script>
 	<script src="scripts/pages/realview_replay.js"></script>
   <script src="scripts/pages/recorder.js"></script>
+  <script src="scripts/pages/bootstrap-slider.js"></script>
 
+  <script type="text/javascript">   
+
+    var s = $("#ex1").slider({}).on('slide', function(){
+                                                var sliderVal = $('#ex1').slider('getValue');
+                                                replayTicks = sliderVal;
+                                                for(var i = 0; i < trucks.trucks.length; i++){
+                                                  var t = trucks.trucks[i];
+                                                  if(t.rawPath[replayTicks][3] != trucks.TRUCK_AWAY){
+                                                    t.model.position.set(t.path[replayTicks].x, 0, t.path[replayTicks].y);
+                                                    trucks.scene.add(t.model);
+                                                  } else{
+                                                    trucks.scene.remove(t.model);
+                                                  }
+                                                  t.target_index = replayTicks;
+                                                }
+                                              }
+    );
+    $('#btn_pause').prop('disabled', true);
+
+    function start(){
+      s.slider('setAttribute', 'max', maxTicks);
+      //timer = setInterval(function () {s.slider('moveSlider', 1); trucks.choose_to_enter();}, 1000);
+      $('#btn_start').prop('disabled', true);
+      $('#btn_pause').prop('disabled', false);
+      paused = false;
+    }
+
+    function pause(){
+      clearInterval(timer);
+      $('#btn_start').prop('disabled', false);
+      $('#btn_pause').prop('disabled', true);
+      paused = true;
+    }
+
+    function replay(){
+      clearInterval(timer);
+      replayTicks = 0;
+      for(var i = 0; i < trucks.trucks.length; i++){
+        trucks.trucks[i].status = this.TRUCK_AWAY;
+        trucks.scene.remove(trucks.trucks[i].model);
+      }
+      $('#btn_start').prop('disabled', false);
+      $('#btn_pause').prop('disabled', true);
+      s.slider('setValue', 0);
+    }
+
+  </script>
   <!-- /initialize page scripts -->
 
 </body>

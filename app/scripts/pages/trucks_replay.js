@@ -3,12 +3,13 @@
 
 'use strict';
 
-var SESSION = 150;
+var SESSION = 100;
 var replayTicks = 0; 	// Number of ticks elapsed in current replay loop
 var maxTicks = 0; 		// Total number of ticks in current replay loop
+var paused = false;
 
 // Determine what trucks need to be on screen each second
-var timer = setInterval(function () {trucks.choose_to_enter();}, 1000);
+var timer = null;//setInterval(function () {trucks.choose_to_enter();}, 1000);
 
 var trucks = {
 
@@ -99,15 +100,15 @@ var trucks = {
 				pNew.push(point);
 			}
 			this.trucks[i].path = pNew;
-			this.trucks[i].entrance_index = this.findEntranceIndex(p);
+			this.trucks[i].entrance_index = this.findEntranceIndex(p, 0);
 			console.log(this.trucks[i].entrance_index);
 			console.log(pNew);
 		}
 	},
 
 	// Returns index of first position on path to be on screen
-	findEntranceIndex : function(pathStr){
-		for(var i = 0; i < pathStr.length; i++){
+	findEntranceIndex : function(pathStr, startSearchIndex){
+		for(var i = startSearchIndex; i < pathStr.length; i++){
 			if(pathStr[i][0].split(',')[3] == 1){
 				return i;
 			}
@@ -186,8 +187,9 @@ var trucks = {
 			else if(this.trucks[i].rawPath[replayTicks][3] == this.TRUCK_LOADING){
 				this.trucks[i].status = this.TRUCK_LOADING;
 			} else if(this.trucks[i].rawPath[replayTicks][3] == this.TRUCK_AWAY){
-				this.scene.remove(this.trucks[i].model);
 				this.trucks[i].status = this.TRUCK_AWAY;
+				this.trucks[i].entrance_index = this.findEntranceIndex(this.truckPaths[i], replayTicks + 1);
+				this.scene.remove(this.trucks[i].model);
 			} else{
 				this.trucks[i].status = this.TRUCK_MOVING;
 			}
@@ -195,19 +197,19 @@ var trucks = {
 		if(replayTicks < maxTicks - 1){
 			replayTicks++;
 		} else{
-			for(var i = 0; i < this.trucks.length; i++){
-				this.scene.remove(this.trucks[i].model);
-			}
-			replayTicks = 0;
+			paused = true;
+			clearInterval(timer);
 		}
 	},
 
 	// Updates position of all trucks
 	update : function(delta) {
-		for (var i = 0; i < this.trucks.length; i++) {
-			var t = this.trucks[i];
-			if (t.status !== this.TRUCK_AWAY) {
-				this.update_one(delta, t);
+		if(paused == false){
+			for (var i = 0; i < this.trucks.length; i++) {
+				var t = this.trucks[i];
+				if (t.status !== this.TRUCK_AWAY) {
+					this.update_one(delta, t);
+				}
 			}
 		}
 	}

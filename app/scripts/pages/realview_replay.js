@@ -6,6 +6,9 @@
 /*global blueprints */
 /*global trucks */
 
+var heatX = 0;
+var heatY = 0;
+
 (function($) {
   'use strict';
 
@@ -61,7 +64,7 @@
     // GRID
     //  
     var gridHelper = new THREE.GridHelper(400, 5);
-    gridHelper.setColors(0x444444, 0x444444);
+    gridHelper.setColors(0x44ff44, 0x444444);
     gridHelper.position.set(centroid.position.x, -0.1, centroid.position.z);
     scene.add(gridHelper);
   }

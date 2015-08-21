@@ -3,7 +3,7 @@
 
 'use strict';
 
-var SESSION = 100;
+var SESSION = 100;		// Session key to pull data from
 var replayTicks = 0; 	// Number of ticks elapsed in current replay loop
 var maxTicks = 0; 		// Total number of ticks in current replay loop
 var paused = false;
@@ -84,7 +84,7 @@ var trucks = {
 		maxTicks = recorder.getMaxTicks(SESSION);
 		for(var i = 0; i < this.trucks.length; i++){
 			console.log(this.trucks[i].rawPath);
-		}	
+		}
 	},
 
 	// Parse out CSV string returned from database into array of three.js Vector2 data structures
@@ -212,5 +212,15 @@ var trucks = {
 				}
 			}
 		}
+	},
+
+	test : function(){
+		var geometry = new THREE.BoxGeometry( 100, 100, 100 );
+	    //var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+	    var texture = new THREE.Texture(document.getElementById('heatmap'));
+	    texture.needsUpdate = true;
+	    var material = new THREE.MeshBasicMaterial( {map: texture, side:THREE.DoubleSide} );
+	    var mesh = new THREE.Mesh( geometry, material );
+	    this.scene.add( mesh ); 
 	}
 };

@@ -1,0 +1,63 @@
+<div id='container'>
+	<canvas id="heatmap" style="width:100%; height:100%; border:1px solid #ff00ff; background-color:#000000"></canvas>
+</div>
+
+<script src="threejs/three.min.js"></script>
+<script src="threejs/three.utils.js"></script>
+<script src="trucks_replay.js"></script>
+<script src="recorder.js"></script>
+<script src="heatmap.js"></script>
+
+<script type="text/javascript">
+	trucks.init();
+
+    // minimal heatmap instance configuration
+    var heatmapInstance = h337.create({
+      // only container is required, the rest will be defaults
+      container: document.getElementById("container")
+    });
+
+    // now generate some random data
+    var points = [];
+    var max = 0;
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    var len = 350;
+
+    for(var i = 0; i < trucks.trucks.length; i++){
+    	var p = trucks.truckPaths[i];
+		trucks.trucks[i].rawPath = [];
+		var pNew = [];
+		for(var j = 0; j < p.length; j++){
+			var pL = p[j][0].split(',');
+			trucks.trucks[i].rawPath.push(pL);
+			var point = {
+	        x: parseFloat(pL[1] * 5),
+	        y: parseFloat(pL[2] * 5),
+	        value: 1
+			}
+			points.push(point);
+		}
+    }
+
+    /*while (len--) {
+      var val = Math.floor(Math.random()*100);
+      max = Math.max(max, val);
+      var point = {
+        x: Math.floor(Math.random()*width),
+        y: Math.floor(Math.random()*height),
+        value: val
+      };
+      points.push(point);
+    }*/
+
+    // heatmap data format
+    var data = { 
+      max: max, 
+      data: points 
+    };
+    // if you have a set of datapoints always use setData instead of addData
+    // for data initialization
+    heatmapInstance.setData(data);
+</script>
+

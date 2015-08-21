@@ -57,6 +57,9 @@ var blueprints = {
 				y = parseFloat($r.attr('y'));
 				w = parseFloat($r.attr('width'));
 				h = parseFloat($r.attr('height'));
+				heatX = parseFloat($r.attr('x'));
+				heatY = parseFloat($r.attr('y'));
+
 
 				var desc_el = $r.find('desc');
 				if (desc_el !== null) {
